@@ -9,7 +9,7 @@ const Users = require('./controllers/users');
 const internals = {};
 
 
-// todo: https://github.com/hapijs/crumb
+// todo: add https://github.com/hapijs/crumb
 
 // Routes
 
@@ -24,8 +24,9 @@ internals.routes = [
 
     // Users
 
-    { method: 'POST', path: '/users', config: Users.save },
+    { method: 'POST', path: '/users', config: Users.insert },
     { method: 'GET', path: '/users/{id}', config: Users.find },
+    { method: 'PUT', path: '/users/{id}', config: Users.update },
     { method: 'DELETE', path: '/users/{id}', config: Users.destroy }
 ];
 

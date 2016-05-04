@@ -1,13 +1,18 @@
 'use strict';
 
 const Joi = require('joi');
+const Scopes = require('../constants').Scopes;
+
 
 module.exports = {
 
 
-    // Create/update user
+    // todo: hash the password
+    
+    // Create user
 
-    save: {
+    insert: {
+        auth: false,
         handler: (request, reply) => {
 
             const db = request.server.app.db;
@@ -17,9 +22,8 @@ module.exports = {
         validate: {
             payload: Joi.object({
                 email: Joi.string().email().required(),
-                id: Joi.number().integer(),
-                password: Joi.string()
-            }).or('id', 'password')
+                password: Joi.string().required()
+            })
         }
     },
 
@@ -27,6 +31,11 @@ module.exports = {
     // Retrieve user
 
     find: {
+        auth: {
+            access: {
+                scope: [Scopes.USER_ID]
+            }
+        },
         handler: (request, reply) => {
 
             const db = request.server.app.db;
@@ -41,17 +50,48 @@ module.exports = {
     },
 
 
-    // Delete user
+    // Update user
 
-    destroy: {
+    update: {
+        auth: {
+            access: {
+                scope: [Scopes.USER_ID]
+            }
+        },
         handler: (request, reply) => {
 
             const db = request.server.app.db;
 
-            db.users.destroy(request.payload, (err, user) => reply({ err, user }));
+            db.users.save(Object.assign(request.params, request.payload), (err, user) => reply({ err, user }));
         },
         validate: {
+            params: Joi.object({
+                id: Joi.number().integer().required()
+            }),
             payload: Joi.object({
+                email: Joi.string().email(),
+                password: Joi.string()
+            }).or('email', 'password')
+        }
+    },
+
+
+    // Delete user
+
+    destroy: {
+        auth: {
+            access: {
+                scope: [Scopes.USER_ID]
+            }
+        },
+        handler: (request, reply) => {
+
+            const db = request.server.app.db;
+
+            db.users.destroy(request.params, (err, user) => reply({ err, user }));
+        },
+        validate: {
+            params: Joi.object({
                 id: Joi.number().integer().required()
             })
         }

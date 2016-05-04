@@ -23,10 +23,10 @@ module.exports = {
             db.users.findOne(request.payload, (err, user) => {
 
 
-                // Bad login, return
+                // Bad login
 
                 if (!user) {
-                    return reply({ err, user });
+                    return reply(false);
                 }
 
 
@@ -35,7 +35,7 @@ module.exports = {
                 const accessToken = Jwt.sign({
                     scope: [`${Scopes.USER}-${user.id}`]
                 }, Config.get('/auth/jwt/secret'), {
-                    expiresIn: 60 * 5,
+                    expiresIn: 60,
                     issuer: Config.get('/auth/jwt/issuer')
                 });
 
@@ -51,7 +51,7 @@ module.exports = {
 
                 request.cookieAuth.set({ accessToken, refreshToken });
 
-                return reply('ok');
+                return reply(true);
             });
         },
         validate: {
@@ -66,11 +66,12 @@ module.exports = {
     // Logout
 
     logout: {
+        auth: false,
         handler: (request, reply) => {
 
             request.cookieAuth.clear();
 
-            return reply('ok');
+            return reply(true);
         }
     }
 };

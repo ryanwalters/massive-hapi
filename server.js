@@ -4,6 +4,7 @@ const Config = require('./api/config');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Massive = require('massive');
+const Scopes = require('./api/constants').Scopes;
 
 const server = new Hapi.Server(Config.get('/server'));
 
@@ -17,6 +18,31 @@ server.app.db = Massive.connectSync({
 });
 
 
+// Cookies
+
+server.register(require('hapi-auth-cookie'), (err) => {
+
+    Hoek.assert(!err, err);
+
+    server.auth.strategy('session', 'cookie', Config.get('/auth/cookie'));
+});
+
+
+// JWT
+
+server.register(require('jot'), (err) => {
+
+    Hoek.assert(!err, err);
+
+    server.auth.strategy('jwt', 'jwt', Config.get('/auth/jwt'));
+    
+    server.auth.default({
+        strategy: 'jwt',
+        scope: [Scopes.ADMIN]
+    });
+});
+
+
 // Routes
 
 server.register(require('./api/routes'), {
@@ -24,16 +50,6 @@ server.register(require('./api/routes'), {
         prefix: Config.get('/api/version')
     }
 }, (err) => Hoek.assert(!err, err));
-
-
-// Cookies
-
-server.register(require('hapi-auth-cookie'), (err) => {
-
-    Hoek.assert(!err, err);
-
-    server.auth.strategy('session', 'cookie', true, Config.get('/auth/cookie'));
-});
 
 
 // Start server

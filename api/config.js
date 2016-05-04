@@ -12,6 +12,13 @@ const criteria = {
 };
 
 
+// Declare internals, anything used in multiple places
+
+const internals = {
+    cookieName: 'cookie-name'
+};
+
+
 // Config
 
 const config = {
@@ -23,7 +30,7 @@ const config = {
         cookie: {
             $filter: 'env',
             $base: {
-                cookie: 'cookie-name'
+                cookie: internals.cookieName
             },
             production: {
                 isSecure: true,
@@ -37,7 +44,9 @@ const config = {
         jwt: {
             $filter: 'env',
             $base: {
-                issuer: 'example.io'
+                cookie: internals.cookieName,
+                issuer: 'example.io',
+                token: 'accessToken'
             },
             production: {
                 secret: process.env.JWT_SECRET
