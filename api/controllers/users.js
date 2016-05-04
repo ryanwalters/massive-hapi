@@ -12,13 +12,14 @@ module.exports = {
 
             const db = request.server.app.db;
 
-            db.users.save(request.payload, (err, results) => reply({ err, results }));
+            db.users.save(request.payload, (err, user) => reply({ err, user }));
         },
         validate: {
             payload: Joi.object({
                 email: Joi.string().email().required(),
-                id: Joi.number().integer()
-            })
+                id: Joi.number().integer(),
+                password: Joi.string()
+            }).or('id', 'password')
         }
     },
 
@@ -30,7 +31,7 @@ module.exports = {
 
             const db = request.server.app.db;
 
-            db.users.findOne(request.params.id, (err, results) => reply({ err, results }));
+            db.users.findOne(request.params.id, (err, user) => reply({ err, user }));
         },
         validate: {
             params: Joi.object({
@@ -47,7 +48,7 @@ module.exports = {
 
             const db = request.server.app.db;
 
-            db.users.destroy(request.payload, (err, results) => reply({ err, results }));
+            db.users.destroy(request.payload, (err, user) => reply({ err, user }));
         },
         validate: {
             payload: Joi.object({

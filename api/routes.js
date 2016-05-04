@@ -1,5 +1,6 @@
 'use strict';
 
+const Auth = require('./controllers/auth');
 const Users = require('./controllers/users');
 
 
@@ -8,9 +9,18 @@ const Users = require('./controllers/users');
 const internals = {};
 
 
+// todo: https://github.com/hapijs/crumb
+
 // Routes
 
 internals.routes = [
+
+
+    // Auth
+
+    { method: 'POST', path: '/login', config: Auth.login },
+    { method: 'POST', path: '/logout', config: Auth.logout },
+
 
     // Users
 

@@ -10,6 +10,13 @@ const server = new Hapi.Server(Config.get('/server'));
 server.connection(Config.get('/connection'));
 
 
+// DB
+
+server.app.db = Massive.connectSync({
+    connectionString: Config.get('/db/connectionString')
+});
+
+
 // Routes
 
 server.register(require('./api/routes'), {
@@ -19,10 +26,13 @@ server.register(require('./api/routes'), {
 }, (err) => Hoek.assert(!err, err));
 
 
-// DB
+// Cookies
 
-server.app.db = Massive.connectSync({
-    connectionString: Config.get('/db/connectionString')
+server.register(require('hapi-auth-cookie'), (err) => {
+
+    Hoek.assert(!err, err);
+
+    server.auth.strategy('session', 'cookie', true, Config.get('/auth/cookie'));
 });
 
 

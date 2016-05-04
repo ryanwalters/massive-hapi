@@ -20,6 +20,20 @@ const config = {
         version: '/v1'
     },
     auth: {
+        cookie: {
+            $filter: 'env',
+            $base: {
+                cookie: 'cookie-name'
+            },
+            production: {
+                isSecure: true,
+                password: process.env.COOKIE_PASSWORD
+            },
+            $default: {
+                isSecure: false,
+                password: 'TheMinimumLengthOfPasswordsIs32!'
+            }
+        },
         jwt: {
             $filter: 'env',
             $base: {
@@ -29,7 +43,7 @@ const config = {
                 secret: process.env.JWT_SECRET
             },
             $default: {
-                secret: 'TheMinimumLengthOfPasswordsIs32!'
+                secret: 'ADifferentPasswordAlsoAtLeast32!'
             }
         }
     },
@@ -58,12 +72,7 @@ const config = {
             connectionString: process.env.DATABASE_URL
         }
     },
-    server: {},
-    showServerErrors: {
-        $filter: 'env',
-        production: false,
-        $default: true
-    }
+    server: {}
 };
 
 const store = new Confidence.Store(config);
